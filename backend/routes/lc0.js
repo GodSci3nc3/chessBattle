@@ -1,7 +1,7 @@
 const { spawn } = require("child_process");
 require("dotenv").config();
 
-const LC0_PATH = process.env.LC0_PATH || "/home/arthur/chess-engines/lc0/lc0-0.31.2/build/release/lc0";
+const LC0_PATH = process.env.LC0_PATH || "/home/arthur/chess-engines/lc0/build/release/lc0";
 
 function getLc0Move(fen) {
     return new Promise((resolve, reject) => {
