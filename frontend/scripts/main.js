@@ -6,7 +6,7 @@ const game = new Chess();
 var board2 = Chessboard('chessboard', {
     draggable: false,
     dropOffBoard: 'trash',
-    sparePieces: true,
+    sparePieces: false,
     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
 });
 
