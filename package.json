@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@chrisoakman/chessboardjs": "^1.0.0",
     "chessboardjs": "^0.0.1"
   }
 }

@@ -1,38 +1,20 @@
-document.addEventListener("DOMContentLoaded", function () {
-    var boardElement = document.getElementById("board");
+var board2 = Chessboard('board2', {
+    draggable: false,
+    dropOffBoard: 'trash',
+    sparePieces: true,
+    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+  })
+  
+  $('#startBtn').on('click', board2.start)
+  $('#clearBtn').on('click', board2.clear)
 
-    if (!boardElement) {
-        console.error("Error: No se encontró el elemento #board en el DOM.");
-        return;
-    }
+  async function makeMove(engine) {
+    const fen = game.fen();  // Obtener la posición actual del tablero en formato FEN
 
-    var board = Chessboard('board', {
-        position: 'start', 
-        draggable: true,    
-        dropOffBoard: 'snapback' 
-    });
+    let move = await fetch(`/move/${engine}?fen=${fen}`)  // Llamada al backend
+        .then(response => response.json())
+        .then(data => data.move);
 
-    async function getAIMove(engine) {
-        const fen = board.position();  
-        const response = await fetch(`http://localhost:3000/next-move?engine=${engine}&fen=${fen}`);
-        const data = await response.json();
-
-        if (data.move) {
-            board.move(data.move);  
-            console.log(`${engine} mueve: ${data.move}`);
-        }
-    }
-
-    async function aiTurn() {
-        await getAIMove('stockfish');  
-        await getAIMove('lc0');        
-    }
-
-
-    setInterval(aiTurn, 3000);
-
-    
-    document.getElementById("reset-btn").addEventListener("click", function () {
-        board.position('start');
-    });
-});
+    // Realizar el movimiento en el juego
+    game.ugly_move(game.move(move));
+}
