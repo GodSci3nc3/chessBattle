@@ -9,7 +9,7 @@ function getLc0Move(fen) {
 
         lc0.stdin.write('uci\n');
         lc0.stdin.write(`position fen ${fen}\n`);
-        lc0.stdin.write('go nodes 1000\n');  // Leela piensa hasta analizar 1000 nodos
+        lc0.stdin.write("go nodes 500\n");  // Leela piensa hasta analizar 1000 nodos
 
         lc0.stdout.on('data', (data) => {
             const output = data.toString();

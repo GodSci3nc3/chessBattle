@@ -33,21 +33,23 @@ async function startGame() {
 
 // Función para simular los turnos de las IAs
 async function playGame() {
-    while (!game.game_over()) {
-        // Turno de Stockfish
-        await makeMove('stockfish');
-        board2.position(game.fen());  // Actualiza el tablero con la nueva jugada
+  while (!game.game_over()) {
+      // Turno de Stockfish
+      await makeMove('stockfish');
+      board2.position(game.fen());  // Actualiza el tablero con la nueva jugada
 
-        if (game.game_over()) break;
+      if (game.game_over()) break;  // Termina el ciclo si el juego acaba
 
-        // Turno de Lc0
-        await makeMove('lc0');
-        board2.position(game.fen());  // Actualiza el tablero con la nueva jugada
-    }
+      // Turno de Lc0
+      await makeMove('lc0');
+      board2.position(game.fen());  // Actualiza el tablero con la nueva jugada
+  }
 
-    // Al final del juego, muestra el resultado
-    alert("Juego terminado: " + game.result());
+  // Cuando el juego termina
+  const result = game.result();  // Puede devolver "1-0" (blancas ganan), "0-1" (negras ganan) o "1/2-1/2" (empate)
+  alert("Juego terminado: " + result);
 }
+
 
 // Función para hacer el movimiento de una IA
 async function makeMove(engine) {
