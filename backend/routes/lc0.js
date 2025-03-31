@@ -8,8 +8,10 @@ function getLc0Move(fen) {
         const lc0 = spawn(LC0_PATH);
 
         lc0.stdin.write('uci\n');
+        lc0.stdin.write('setoption name Threads value 2\n');
+        lc0.stdin.write('setoption name NNCacheSize value 2000000\n');
         lc0.stdin.write(`position fen ${fen}\n`);
-        lc0.stdin.write("go nodes 500\n");  // Leela piensa hasta analizar 1000 nodos
+        lc0.stdin.write("go nodes 1000 movetime 5000\n");
 
         lc0.stdout.on('data', (data) => {
             const output = data.toString();

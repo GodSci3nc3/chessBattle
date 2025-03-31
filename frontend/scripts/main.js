@@ -14,6 +14,27 @@ var board2 = Chessboard('chessboard', {
 $('#startBtn').on('click', startGame);
 $('#clearBtn').on('click', clearBoard);
 
+
+// Configuración de la ventana modal
+const modal = document.getElementById('result-modal');
+const closeModal = document.querySelector('.close-modal');
+const newGameBtn = document.getElementById('new-game-btn');
+
+closeModal.onclick = function() {
+  modal.style.display = "none";
+}
+
+newGameBtn.onclick = function() {
+  modal.style.display = "none";
+  startGame();
+}
+
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+
 document.getElementById('toggle-console').addEventListener('click', function() {
   const consolePanel = document.getElementById('console-panel');
   const chevronIcon = this.querySelector('i');
@@ -103,13 +124,62 @@ function clearBoard() {
 async function startGame() {
     game.reset();  
     board2.position(game.fen());  
+    moveCount = 0;
+    document.getElementById('log-list').innerHTML = '';
 
     playGame();
 }
 
+// Función para determinar el resultado del juego
+function getGameResult() {
+  if (game.in_checkmate()) {
+    // Determinar quién ganó basado en el turno
+    return game.turn() === 'w' ? "Leela (lc0) ha ganado por jaque mate" : "Stockfish ha ganado por jaque mate";
+  } else if (game.in_draw()) {
+    if (game.in_stalemate()) {
+      return "Empate por ahogado";
+    } else if (game.in_threefold_repetition()) {
+      return "Empate por triple repetición";
+    } else if (game.insufficient_material()) {
+      return "Empate por material insuficiente";
+    } else {
+      return "Empate por regla de 50 movimientos";
+    }
+  } else {
+    return "Partida finalizada";
+  }
+}
+
+// Mostrar resultado en la ventana modal
+function showResultModal(result) {
+  const resultMessage = document.getElementById('result-message');
+  const resultTitle = document.getElementById('result-title');
+  const resultAnimation = document.getElementById('result-animation');
+  
+  resultMessage.textContent = result;
+  
+  // Personalizar el título y la animación según el resultado
+  if (result.includes("Stockfish ha ganado")) {
+    resultTitle.textContent = "¡Victoria de Stockfish!";
+    resultTitle.style.color = "#d6a145"; // Color dorado
+    resultAnimation.innerHTML = '<i class="fas fa-trophy" style="color: #d6a145; font-size: 4rem;"></i>';
+  } else if (result.includes("Leela (lc0) ha ganado")) {
+    resultTitle.textContent = "¡Victoria de Leela!";
+    resultTitle.style.color = "#808080"; // Color gris
+    resultAnimation.innerHTML = '<i class="fas fa-trophy" style="color: #808080; font-size: 4rem;"></i>';
+  } else {
+    resultTitle.textContent = "Empate";
+    resultTitle.style.color = "#3498db"; // Color azul
+    resultAnimation.innerHTML = '<i class="fas fa-handshake" style="color: #3498db; font-size: 4rem;"></i>';
+  }
+  
+  modal.style.display = "block";
+}
+
 async function playGame() {
   if (game.game_over()) {
-    alert("Juego terminado: " + game.result());
+    const result = getGameResult();
+    showResultModal(result);
     return;
   }
 
@@ -123,8 +193,8 @@ async function playGame() {
       board2.position(game.fen()); 
   }
 
-  const result = game.result(); 
-  alert("Juego terminado: " + result);
+  const result = getGameResult();
+  showResultModal(result);
 }
 
 async function makeMove(engine) {

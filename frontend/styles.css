@@ -267,6 +267,77 @@
   .square-55d63 {
     padding: 2px !important;
   }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 30px;
+    border: none;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: slideIn 0.4s ease;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .close-modal {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .close-modal:hover {
+    color: #555;
+  }
+  
+  #result-title {
+    margin-top: 0;
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
+  
+  #result-message {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  #result-animation {
+    margin: 20px 0;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   
   @media (max-width: 768px) {
     .game {
