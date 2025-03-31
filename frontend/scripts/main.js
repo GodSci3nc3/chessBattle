@@ -1,7 +1,6 @@
 // Inicializa Chess.js para manejar el estado del tablero
 const game = new Chess();
 
-
 // Inicializa Chessboard.js
 var board2 = Chessboard('chessboard', {
     draggable: false,
@@ -9,8 +8,6 @@ var board2 = Chessboard('chessboard', {
     sparePieces: false,
     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
 });
-
-
 
 // Al iniciar el juego, resetea el tablero
 $('#startBtn').on('click', startGame);
@@ -33,6 +30,12 @@ async function startGame() {
 
 // Función para simular los turnos de las IAs
 async function playGame() {
+  // Verifica si el juego ha terminado antes de continuar
+  if (game.game_over()) {
+    alert("Juego terminado: " + game.result());
+    return;
+  }
+
   while (!game.game_over()) {
       // Turno de Stockfish
       await makeMove('stockfish');
@@ -45,11 +48,10 @@ async function playGame() {
       board2.position(game.fen());  // Actualiza el tablero con la nueva jugada
   }
 
-  // Cuando el juego termina
-  const result = game.result();  // Puede devolver "1-0" (blancas ganan), "0-1" (negras ganan) o "1/2-1/2" (empate)
+  // Cuando el juego termina, mostrar el resultado
+  const result = game.result();  // "1-0", "0-1", "1/2-1/2"
   alert("Juego terminado: " + result);
 }
-
 
 // Función para hacer el movimiento de una IA
 async function makeMove(engine) {
@@ -87,5 +89,3 @@ async function makeMove(engine) {
   // Esperar un poco para visualizar los movimientos (opcional)
   await new Promise(resolve => setTimeout(resolve, 1000));
 }
-
-
