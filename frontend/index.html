@@ -5,29 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chess Battle</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
+          integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
+          crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+           integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+           crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+           integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
+           crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-
-    <link rel="stylesheet"
-      href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
-      integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
-      crossorigin="anonymous">
-
-      <script src="https://code.jquery.com/jquery-3.5.1.min.js"
-        integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
-        crossorigin="anonymous"></script>
-
-        <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
-        integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
-        crossorigin="anonymous"></script>
-
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
 
 </head>
 <body>
-    <div id="chessboard" class="chessboard" style="width: 400px"></div>
-<button id="startBtn">Start Position</button>
-<button id="clearBtn">Clear Board</button>
+    <h1>StockFish (dorados) vs Leela lc0 (grises)</h1>
+  
+    <div class="game">
+      <div class="gameContent">
+        <div id="chessboard" class="chessboard" style="width: 400px"></div>
+        <div class="button-group">
+          <button id="startBtn"><i class="fas fa-chess-board"></i> Iniciar</button>
+          <button id="clearBtn"><i class="fas fa-trash-alt"></i> Limpiar Tablero</button>
+        </div>
+      </div>
+      
+      <div id="console-panel" class="console-panel">
+        <div class="console-header">
+          <h3>Movimientos de la IA</h3>
+          <button id="toggle-console" class="toggle-log-btn">
+            <i class="fas fa-chevron-up"></i>
+          </button>
+        </div>
+        <div id="console-content" class="console-content">
+          <ul id="log-list">
+            <!-- Los logs se agregarán aquí -->
+          </ul>
+        </div>
+      </div>
+    </div>
     <script src="/scripts/main.js"></script>
 </body>
 </html>

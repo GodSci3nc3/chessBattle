@@ -1,81 +1,152 @@
-// Inicializa Chess.js para manejar el estado del tablero
 const game = new Chess();
 
-// Inicializa Chessboard.js
 var board2 = Chessboard('chessboard', {
     draggable: false,
     dropOffBoard: 'trash',
     sparePieces: false,
-    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+    pieceTheme: '/img/{piece}.png',
+    boardTheme: {
+      light: '#f0d9b5',
+      dark: '#b58863'
+    }
 });
 
-// Al iniciar el juego, resetea el tablero
 $('#startBtn').on('click', startGame);
 $('#clearBtn').on('click', clearBoard);
 
-// Función para reiniciar el tablero
-function clearBoard() {
-    game.reset();  // Resetea el estado del juego
-    board2.position(game.fen());  // Actualiza el tablero con la posición inicial
+document.getElementById('toggle-console').addEventListener('click', function() {
+  const consolePanel = document.getElementById('console-panel');
+  const chevronIcon = this.querySelector('i');
+  
+  if (consolePanel.style.height === '45px' || consolePanel.classList.contains('collapsed')) {
+    consolePanel.style.height = '500px';
+    consolePanel.classList.remove('collapsed');
+    chevronIcon.className = 'fas fa-chevron-up';
+  } else {
+    consolePanel.style.height = '45px';
+    consolePanel.classList.add('collapsed');
+    chevronIcon.className = 'fas fa-chevron-down';
+  }
+});
+
+// Función para agregar logs
+let moveCount = 0;
+function logMoveToConsole(engine, move) {
+  moveCount++;
+  const logList = document.getElementById('log-list');
+  const logItem = document.createElement('li');
+  
+  const moveCountSpan = document.createElement('span');
+  moveCountSpan.className = 'move-count';
+  moveCountSpan.textContent = moveCount;
+  
+  const engineSpan = document.createElement('span');
+  engineSpan.className = engine.toLowerCase() === 'stockfish' ? 'engine-stockfish' : 'engine-leela';
+  engineSpan.textContent = engine;
+  
+  logItem.appendChild(moveCountSpan);
+  logItem.appendChild(engineSpan);
+  logItem.appendChild(document.createTextNode(` movió: ${move}`));
+  
+  logList.appendChild(logItem);
+  
+  // Auto-scroll al último item
+  const consoleContent = document.getElementById('console-content');
+  consoleContent.scrollTop = consoleContent.scrollHeight;
 }
 
-// Función para iniciar el juego entre las IAs
-async function startGame() {
-    game.reset();  // Resetea el estado del juego
-    board2.position(game.fen());  // Establece el tablero en la posición inicial
+function adjustPiecesSize() {
+  // Esperar a que las piezas estén en el DOM
+  setTimeout(() => {
+    // Aplicar estilos a las piezas usando su clase
+    const pieces = document.querySelectorAll('.piece-417db');
+    pieces.forEach(piece => {
+      // Hacemos las piezas más pequeñas con transform scale
+      piece.style.transform = 'scale(0.8)';
+      
+      // Centramos las piezas en sus casillas
+      const square = piece.parentElement;
+      if (square) {
+        const squareRect = square.getBoundingClientRect();
+        const pieceRect = piece.getBoundingClientRect();
+        
+        const centerX = (squareRect.width - pieceRect.width) / 2;
+        const centerY = (squareRect.height - pieceRect.height) / 2;
+        
+        // Aseguramos que las piezas estén centradas
+        piece.style.position = 'absolute';
+        piece.style.left = '50%';
+        piece.style.top = '50%';
+        piece.style.transform = 'translate(-50%, -50%) scale(0.8)';
+      }
+    });
+  }, 100);
+}
 
-    // Comienza el juego entre las IAs
+// Función adicional para redimensionar piezas
+function resizePieces() {
+  // Método alternativo para redimensionar piezas
+  const style = document.createElement('style');
+  style.textContent = `
+    .piece-417db {
+      transform: scale(0.8) !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function clearBoard() {
+    game.reset();  
+    board2.position(game.fen());  
+}
+
+async function startGame() {
+    game.reset();  
+    board2.position(game.fen());  
+
     playGame();
 }
 
-// Función para simular los turnos de las IAs
 async function playGame() {
-  // Verifica si el juego ha terminado antes de continuar
   if (game.game_over()) {
     alert("Juego terminado: " + game.result());
     return;
   }
 
   while (!game.game_over()) {
-      // Turno de Stockfish
       await makeMove('stockfish');
-      board2.position(game.fen());  // Actualiza el tablero con la nueva jugada
+      board2.position(game.fen());  
 
-      if (game.game_over()) break;  // Termina el ciclo si el juego acaba
+      if (game.game_over()) break;  
 
-      // Turno de Lc0
       await makeMove('lc0');
-      board2.position(game.fen());  // Actualiza el tablero con la nueva jugada
+      board2.position(game.fen()); 
   }
 
-  // Cuando el juego termina, mostrar el resultado
-  const result = game.result();  // "1-0", "0-1", "1/2-1/2"
+  const result = game.result(); 
   alert("Juego terminado: " + result);
 }
 
-// Función para hacer el movimiento de una IA
 async function makeMove(engine) {
-  const fen = game.fen(); // Obtener la posición actual del tablero en formato FEN
+  const fen = game.fen(); 
   
   let uciMove = await fetch(`/move/${engine}?fen=${fen}`)
     .then(response => response.json())
     .then(data => data.move);
   
-  console.log("Movimiento UCI de la IA:", uciMove); // Para verificar
+  console.log("Movimiento UCI de la IA:", uciMove); 
+  logMoveToConsole(engine, uciMove);
   
-  // Convertir movimiento UCI (como "e2e4") a formato Chess.js
   const from = uciMove.substring(0, 2);
   const to = uciMove.substring(2, 4);
   let promotion = uciMove.length > 4 ? uciMove.substring(4, 5) : undefined;
   
-  // Crear objeto de movimiento para Chess.js
   const moveObj = {
     from: from,
     to: to,
     promotion: promotion
   };
   
-  // Realizar el movimiento
   const move = game.move(moveObj);
   
   if (move === null) {
@@ -83,9 +154,7 @@ async function makeMove(engine) {
     return;
   }
   
-  // Actualizar el tablero con la nueva jugada
   board2.position(game.fen());
   
-  // Esperar un poco para visualizar los movimientos (opcional)
   await new Promise(resolve => setTimeout(resolve, 1000));
 }
