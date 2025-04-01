@@ -1,64 +1,286 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess Battle</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
-          integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
-          crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
-          integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
-          crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
-          integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
-          crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Chess Battle - Observa el enfrentamiento entre las mejores IAs de ajedrez: StockFish y Leela lc0">
+  <meta name="keywords" content="ajedrez, stockfish, leela, ia, chess engine, batalla">
+  <meta name="author" content="Chess Battle">
+  <title>Chess Battle - Duelo de IAs | StockFish vs Leela</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M19 22H5v-2h14v2M17.16 8.26A9.001 9.001 0 0 1 8.26 17.16A9.003 9.003 0 0 1 2 12C2 6.48 6.48 2 12 2c2.83 0 5.36 1.25 7.16 3.26L18 8h2V6c0-.56.44-1 1-1s1 .44 1 1v6h-6c-.56 0-1-.44-1-1s.44-1 1-1h2l-1.84-2.74z' fill='#d9a066'/></svg>" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
+    integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
+    crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+    integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+    integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
-    <h1>StockFish (dorados) vs Leela lc0 (grises)</h1>
-  
+  <header class="site-header">
+    <div class="logo-container">
+      <div class="logo">
+        <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M19 22H5v-2h14v2M17.16 8.26A9.001 9.001 0 0 1 8.26 17.16A9.003 9.003 0 0 1 2 12C2 6.48 6.48 2 12 2c2.83 0 5.36 1.25 7.16 3.26L18 8h2V6c0-.56.44-1 1-1s1 .44 1 1v6h-6c-.56 0-1-.44-1-1s.44-1 1-1h2l-1.84-2.74z' fill='%23d9a066'/></svg>" alt="Chess Battle Logo">
+      </div>
+      <h1>Chess Battle <span class="subtitle">| Duelo de IAs</span></h1>
+    </div>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#" class="active">Inicio</a></li>
+        <li><a href="#about">Sobre las IAs</a></li>
+        <li><a href="#stats">Estadísticas</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero-section">
+      <h2>StockFish <span class="gold-text">(dorados)</span> vs Leela lc0 <span class="silver-text">(grises)</span></h2>
+      <p class="hero-description">Observa en tiempo real cómo se enfrentan dos de los motores de ajedrez más potentes del mundo en una batalla de inteligencia artificial.</p>
+    </section>
+
+    <section class="engine-info-bar">
+      <div class="engine-card stockfish">
+        <div class="engine-icon"><i class="fas fa-microchip"></i></div>
+        <div class="engine-details">
+          <h3>StockFish</h3>
+          <p>Campeón mundial TCEC</p>
+        </div>
+        <div class="status-indicator" id="stockfish-status">Esperando</div>
+      </div>
+
+      <div class="timer-display">
+        <div id="move-counter">Movimiento: <span id="current-move">0</span></div>
+        <div id="timer">00:00</div>
+        <div id="current-turn">Turno: <span id="current-player">-</span></div>
+      </div>
+
+      <div class="engine-card leela">
+        <div class="engine-icon"><i class="fas fa-brain"></i></div>
+        <div class="engine-details">
+          <h3>Leela lc0</h3>
+          <p>Red neuronal avanzada</p>
+        </div>
+        <div class="status-indicator" id="leela-status">Esperando</div>
+      </div>
+    </section>
+
     <div class="game">
       <div class="gameContent">
         <div id="chessboard" class="chessboard" style="width: 400px"></div>
         <div class="button-group">
-          <button id="startBtn"><i class="fas fa-chess-board"></i> Iniciar</button>
-          <button id="clearBtn"><i class="fas fa-trash-alt"></i> Limpiar Tablero</button>
+          <button id="startBtn"><i class="fas fa-chess-board"></i> Iniciar Duelo</button>
+          <button id="clearBtn"><i class="fas fa-trash-alt"></i> Reiniciar Tablero</button>
+          <button id="analyzeBtn"><i class="fas fa-search-plus"></i> Analizar Partida</button>
         </div>
       </div>
-      
       <div id="console-panel" class="console-panel">
         <div class="console-header">
-          <h3>Movimientos de la IA</h3>
-          <button id="toggle-console" class="toggle-log-btn">
-            <i class="fas fa-chevron-up"></i>
-          </button>
+          <h3><i class="fas fa-terminal"></i> Movimientos de la IA</h3>
+          <div class="console-controls">
+            <button id="download-pgn" class="control-btn" title="Descargar partida en formato PGN">
+              <i class="fas fa-download"></i>
+            </button>
+            <button id="toggle-console" class="toggle-log-btn">
+              <i class="fas fa-chevron-up"></i>
+            </button>
+          </div>
         </div>
         <div id="console-content" class="console-content">
+          <div class="engine-thinking" id="engine-thinking">
+            <div class="thinking-indicator">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+            <p>Esperando inicio del juego...</p>
+          </div>
           <ul id="log-list">
-            
+            <!-- Los movimientos aparecerán aquí -->
           </ul>
         </div>
       </div>
     </div>
 
-    <div id="result-modal" class="modal">
-        <div class="modal-content">
-          <span class="close-modal">&times;</span>
-          <h2 id="result-title">Partida Finalizada</h2>
-          <p id="result-message"></p>
-          <div id="result-animation"></div>
-          <button id="new-game-btn">Nueva Partida</button>
+    <section id="about" class="info-section">
+      <h2>Sobre las IAs de Ajedrez</h2>
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="card-header stockfish-header">
+            <i class="fas fa-microchip"></i>
+            <h3>StockFish</h3>
+          </div>
+          <div class="card-content">
+            <p>StockFish es un motor de ajedrez de código abierto considerado uno de los más fuertes del mundo, con un ELO estimado superior a 3500. Utiliza un enfoque tradicional de búsqueda de árbol alfa-beta con evaluaciones posicionales avanzadas.</p>
+            <div class="engine-stats">
+              <div class="stat-item">
+                <div class="stat-label">ELO</div>
+                <div class="stat-value">3546</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Estilo</div>
+                <div class="stat-value">Táctico</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="card-header leela-header">
+            <i class="fas fa-brain"></i>
+            <h3>Leela Chess Zero</h3>
+          </div>
+          <div class="card-content">
+            <p>Leela Chess Zero (lc0) es un motor de ajedrez que utiliza redes neuronales y aprendizaje por refuerzo, inspirado por AlphaZero de DeepMind. Tiene un estilo de juego más posicional y "humano" comparado con los motores tradicionales.</p>
+            <div class="engine-stats">
+              <div class="stat-item">
+                <div class="stat-label">ELO</div>
+                <div class="stat-value">3485</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Estilo</div>
+                <div class="stat-value">Posicional</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+    </section>
 
-    <script src="/scripts/main.js"></script>
+    <section id="stats" class="stats-section">
+      <h2>Estadísticas de Enfrentamientos</h2>
+      <div class="stats-container">
+        <div class="stats-chart">
+          <div class="chart-container">
+            <canvas id="results-chart"></canvas>
+          </div>
+        </div>
+        <div class="stats-summary">
+          <div class="stat-box total-games">
+            <h3>Partidas Totales</h3>
+            <div class="stat-number">1,243</div>
+          </div>
+          <div class="stat-box win-stockfish">
+            <h3>Victorias StockFish</h3>
+            <div class="stat-number">483</div>
+          </div>
+          <div class="stat-box win-leela">
+            <h3>Victorias Leela</h3>
+            <div class="stat-number">451</div>
+          </div>
+          <div class="stat-box draws">
+            <h3>Tablas</h3>
+            <div class="stat-number">309</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="faq-section">
+      <h2>Preguntas Frecuentes</h2>
+      <div class="accordion">
+        <div class="accordion-item">
+          <div class="accordion-header">
+            <h3>¿Qué motor de ajedrez es más fuerte?</h3>
+            <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+          </div>
+          <div class="accordion-content">
+            <p>Ambos motores están entre los más fuertes del mundo. StockFish tiene una ligera ventaja en torneos oficiales, pero Leela lc0 ha demostrado ser extremadamente competitiva y en ocasiones superior en posiciones estratégicas complejas.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header">
+            <h3>¿Cómo funcionan estas IAs?</h3>
+            <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+          </div>
+          <div class="accordion-content">
+            <p>StockFish utiliza algoritmos tradicionales de búsqueda con evaluaciones posicionales precisas, mientras que Leela Chess Zero emplea redes neuronales entrenadas mediante aprendizaje por refuerzo, similar a AlphaZero de DeepMind.</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header">
+            <h3>¿Puedo descargar la partida?</h3>
+            <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+          </div>
+          <div class="accordion-content">
+            <p>Sí, puedes descargar la notación de la partida en formato PGN utilizando el botón de descarga ubicado en la parte superior del panel de movimientos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-columns">
+      <div class="footer-column">
+        <h4>Chess Battle</h4>
+        <p>Una plataforma para admirar el poder y la estrategia de los motores de ajedrez más avanzados del mundo.</p>
+      </div>
+      <div class="footer-column">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="#">Inicio</a></li>
+          <li><a href="#about">Sobre las IAs</a></li>
+          <li><a href="#stats">Estadísticas</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Recursos</h4>
+        <ul>
+          <li><a href="https://stockfishchess.org/" target="_blank">Sitio oficial StockFish</a></li>
+          <li><a href="https://lczero.org/" target="_blank">Sitio oficial Leela Chess Zero</a></li>
+          <li><a href="https://www.chess.com/" target="_blank">Chess.com</a></li>
+          <li><a href="https://lichess.org/" target="_blank">Lichess.org</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Chess Battle. Todos los derechos reservados.</p>
+      <div class="social-links">
+        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="result-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 id="result-title">Partida Finalizada</h2>
+      <div class="result-badge" id="result-badge">
+        <i class="fas fa-trophy"></i>
+      </div>
+      <p id="result-message"></p>
+      <div id="result-animation"></div>
+      <div class="result-stats">
+        <div class="stat-item">
+          <div class="stat-label">Movimientos</div>
+          <div class="stat-value" id="total-moves">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Tiempo</div>
+          <div class="stat-value" id="total-time">00:00</div>
+        </div>
+      </div>
+      <button id="new-game-btn" class="primary-btn">Nueva Partida</button>
+      <button id="share-result-btn" class="secondary-btn"><i class="fas fa-share-alt"></i> Compartir Resultado</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+  <script src="/scripts/main.js"></script>
+  <script src="/scripts/stats.js"></script>
+  <script src="/scripts/ui.js"></script>
 </body>
 </html>
