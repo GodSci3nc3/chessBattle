@@ -1,6 +1,4 @@
-// Script de UI complementario (ui.js)
 document.addEventListener('DOMContentLoaded', function() {
-    // Manejar el acordeón de FAQ
     const accordionItems = document.querySelectorAll('.accordion-item');
     
     accordionItems.forEach(item => {
@@ -9,19 +7,16 @@ document.addEventListener('DOMContentLoaded', function() {
       header.addEventListener('click', () => {
         const isActive = item.classList.contains('active');
         
-        // Cerrar todos los acordeones activos
         accordionItems.forEach(accordItem => {
           accordItem.classList.remove('active');
         });
         
-        // Si el elemento clicado no estaba activo, activarlo
         if (!isActive) {
           item.classList.add('active');
         }
       });
     });
   
-    // Inicializar gráfico de estadísticas si existe el elemento
     const chartCanvas = document.getElementById('results-chart');
     if (chartCanvas) {
       const ctx = chartCanvas.getContext('2d');
@@ -90,24 +85,20 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
     
-    // Simulación de estado de los motores
     const stockfishStatus = document.getElementById('stockfish-status');
     const leelaStatus = document.getElementById('leela-status');
     const engineThinking = document.getElementById('engine-thinking');
     
-    // Inicializar manejadores de botones
     const startBtn = document.getElementById('startBtn');
     const downloadPgn = document.getElementById('download-pgn');
     const analyzeBtn = document.getElementById('analyzeBtn');
     
     if (startBtn) {
       startBtn.addEventListener('click', function() {
-        // Actualizar indicadores de estado al iniciar
         if (stockfishStatus && leelaStatus) {
           stockfishStatus.textContent = 'Activo';
           stockfishStatus.classList.add('active');
           
-          // Simular que Stockfish está pensando primero
           setTimeout(() => {
             stockfishStatus.textContent = 'Pensando';
             stockfishStatus.classList.remove('active');
@@ -119,10 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
           }, 500);
         }
         
-        // Iniciar el contador
         startTimer();
         
-        // Actualizar el turno actual
         document.getElementById('current-player').textContent = 'StockFish';
         document.getElementById('current-player').className = 'engine-stockfish';
       });
@@ -130,21 +119,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (downloadPgn) {
       downloadPgn.addEventListener('click', function() {
-        // Simular descarga de PGN
-        alert('Descarga de notación PGN iniciada');
+        const pgn = game.pgn();  
         
-        // En una implementación real, aquí generarías el archivo PGN
-        // y lo ofrecerías como descarga
+        const blob = new Blob([pgn], { type: 'text/plain' });
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);  
+        link.download = 'partida.pgn';  
+        
+        link.click();
+    
+        alert('Descarga de notación PGN iniciada');
       });
     }
     
-    if (analyzeBtn) {
-      analyzeBtn.addEventListener('click', function() {
-        alert('Análisis de partida no disponible en modo de demostración');
-      });
-    }
-    
-    // Función para el temporizador
     let timer;
     let seconds = 0;
     
@@ -173,7 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    // Manejar el scroll suave para los enlaces de navegación
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function(e) {
         e.preventDefault();
@@ -191,7 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
     
-    // Manejar botón "Nueva Partida" en el modal
     const newGameBtn = document.getElementById('new-game-btn');
     const modal = document.getElementById('result-modal');
     const closeModal = document.querySelector('.close-modal');
@@ -200,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
       newGameBtn.addEventListener('click', function() {
         modal.style.display = 'none';
         
-        // En una implementación real, aquí reiniciarías el juego
       });
     }
     
@@ -210,14 +195,12 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
     
-    // Cerrar el modal al hacer clic fuera de él
     window.addEventListener('click', function(event) {
       if (event.target === modal) {
         modal.style.display = 'none';
       }
     });
     
-    // Simular compartir resultado
     const shareResultBtn = document.getElementById('share-result-btn');
     if (shareResultBtn) {
       shareResultBtn.addEventListener('click', function() {

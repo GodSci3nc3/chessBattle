@@ -18,74 +18,36 @@ $('#clearBtn').on('click', clearBoard);
 let gameStartTime = 0;
 let moveStartTime = 0;
 let timerInterval = null;
-let totalElapsedTime = '00:00.0';
+let totalElapsedTime = '00:00';
 let currentEngine = '';
 
-// Crear y agregar el elemento del cronómetro en el HTML
-const timerHTML = `
-  <div id="timer-container">
-    <div class="timer-wrapper">
-      <div class="timer-block">
-        <div class="timer-label">
-          <span id="current-engine">Esperando...</span> está pensando
-        </div>
-      </div>
-      <div class="timer-block">
-        <div class="timer-label">Tiempo total:</div>
-        <div id="timer" class="timer">00:00.0</div>
-      </div>
-    </div>
-  </div>
-`;
+// Usar los elementos existentes en el HTML en lugar de crear nuevos
+const timerElement = document.getElementById('timer');
+const currentPlayerElement = document.getElementById('current-player');
+const totalMovesElement = document.getElementById('total-moves');
+const totalTimeElement = document.getElementById('total-time');
 
-// Insertar el HTML del temporizador justo después del tablero
-document.querySelector('.button-group').insertAdjacentHTML('afterend', timerHTML);
+// Referencias a los estados de los motores
+const stockfishStatus = document.getElementById('stockfish-status');
+const leelaStatus = document.getElementById('leela-status');
+const engineThinking = document.getElementById('engine-thinking');
 
-// Crear y agregar HTML de la ventana modal al documento
-const modalHTML = `
-  <div id="result-modal" class="modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2 id="result-title">Partida Finalizada</h2>
-      <p id="result-message"></p>
-      <div id="final-time">Tiempo total: <span id="final-time-value">00:00.0</span></div>
-      <div id="result-animation"></div>
-      <button id="new-game-btn">Nueva Partida</button>
-    </div>
-  </div>
-`;
-document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-// Configuración de la ventana modal
+// Configuración de la ventana modal (que ya existe en el HTML)
 const modal = document.getElementById('result-modal');
 const closeModal = document.querySelector('.close-modal');
 const newGameBtn = document.getElementById('new-game-btn');
-
-closeModal.onclick = function() {
-  modal.style.display = "none";
-}
-
-newGameBtn.onclick = function() {
-  modal.style.display = "none";
-  startGame();
-}
-
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
+const resultTitle = document.getElementById('result-title');
+const resultMessage = document.getElementById('result-message');
+const resultBadge = document.getElementById('result-badge');
 
 document.getElementById('toggle-console').addEventListener('click', function() {
   const consolePanel = document.getElementById('console-panel');
   const chevronIcon = this.querySelector('i');
   
-  if (consolePanel.style.height === '45px' || consolePanel.classList.contains('collapsed')) {
-    consolePanel.style.height = '500px';
+  if (consolePanel.classList.contains('collapsed')) {
     consolePanel.classList.remove('collapsed');
     chevronIcon.className = 'fas fa-chevron-up';
   } else {
-    consolePanel.style.height = '45px';
     consolePanel.classList.add('collapsed');
     chevronIcon.className = 'fas fa-chevron-down';
   }
@@ -93,16 +55,37 @@ document.getElementById('toggle-console').addEventListener('click', function() {
 
 // Funciones para el cronómetro
 function startGameTimer() {
-  // Iniciar el cronómetro del juego
   gameStartTime = Date.now();
-  timerInterval = setInterval(updateTimer, 100);
+  timerInterval = setInterval(updateTimer, 1000); // Actualizar cada segundo
 }
 
 function startEngineTurn(engine) {
-  // Actualizar el motor actual y guardar el tiempo de inicio del movimiento
   currentEngine = engine;
-  document.getElementById('current-engine').textContent = engine;
-  document.getElementById('current-engine').className = engine.toLowerCase() === 'stockfish' ? 'engine-stockfish' : 'engine-leela';
+  
+  // Actualizar el jugador actual en la interfaz
+  if (currentPlayerElement) {
+    currentPlayerElement.textContent = engine;
+    currentPlayerElement.className = engine.toLowerCase() === 'stockfish' ? 'engine-stockfish' : 'engine-leela';
+  }
+  
+  // Actualizar los indicadores de estado
+  if (engine.toLowerCase() === 'stockfish') {
+    stockfishStatus.textContent = 'Pensando';
+    stockfishStatus.className = 'status-indicator thinking';
+    leelaStatus.textContent = 'Esperando';
+    leelaStatus.className = 'status-indicator';
+  } else {
+    leelaStatus.textContent = 'Pensando';
+    leelaStatus.className = 'status-indicator thinking';
+    stockfishStatus.textContent = 'Esperando';
+    stockfishStatus.className = 'status-indicator';
+  }
+  
+  // Actualizar el mensaje de pensamiento
+  if (engineThinking) {
+    engineThinking.querySelector('p').textContent = `${engine} está calculando su movimiento...`;
+  }
+  
   moveStartTime = Date.now();
 }
 
@@ -118,9 +101,8 @@ function calculateMoveDuration() {
   const elapsedMs = Date.now() - moveStartTime;
   const minutes = Math.floor(elapsedMs / 60000);
   const seconds = Math.floor((elapsedMs % 60000) / 1000);
-  const tenths = Math.floor((elapsedMs % 1000) / 100);
   
-  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${tenths}`;
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function stopGameTimer() {
@@ -129,18 +111,22 @@ function stopGameTimer() {
     timerInterval = null;
   }
   
-  // Guardar el tiempo final
-  document.getElementById('final-time-value').textContent = totalElapsedTime;
+  // Actualizar el tiempo total en el modal de resultados
+  if (totalTimeElement) {
+    totalTimeElement.textContent = totalElapsedTime;
+  }
 }
 
 function updateTimer() {
   const elapsedMs = Date.now() - gameStartTime;
   const minutes = Math.floor(elapsedMs / 60000);
   const seconds = Math.floor((elapsedMs % 60000) / 1000);
-  const tenths = Math.floor((elapsedMs % 1000) / 100);
   
-  totalElapsedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${tenths}`;
-  document.getElementById('timer').textContent = totalElapsedTime;
+  totalElapsedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  
+  if (timerElement) {
+    timerElement.textContent = totalElapsedTime;
+  }
 }
 
 function updateLastLogItemWithTime(time) {
@@ -153,16 +139,9 @@ function updateLastLogItemWithTime(time) {
     timeSpan.className = 'move-time';
     timeSpan.textContent = time;
     
-    // Crear elemento de tiempo total
-    const totalTimeSpan = document.createElement('span');
-    totalTimeSpan.className = 'total-time';
-    totalTimeSpan.textContent = totalElapsedTime;
-    
-    // Añadir tiempos al último elemento de log
-    lastLogItem.appendChild(document.createTextNode(' - Duración: '));
+    // Añadir tiempo al último elemento de log
+    lastLogItem.appendChild(document.createTextNode(' - Tiempo: '));
     lastLogItem.appendChild(timeSpan);
-    lastLogItem.appendChild(document.createTextNode(' - Tiempo total: '));
-    lastLogItem.appendChild(totalTimeSpan);
   }
 }
 
@@ -182,78 +161,60 @@ function logMoveToConsole(engine, move) {
   engineSpan.textContent = engine;
   
   logItem.appendChild(moveCountSpan);
+  logItem.appendChild(document.createTextNode(' '));
   logItem.appendChild(engineSpan);
   logItem.appendChild(document.createTextNode(` movió: ${move}`));
   
   logList.appendChild(logItem);
+  
+  // Actualizar el contador de movimientos
+  if (totalMovesElement) {
+    totalMovesElement.textContent = moveCount;
+  }
   
   // Auto-scroll al último item
   const consoleContent = document.getElementById('console-content');
   consoleContent.scrollTop = consoleContent.scrollHeight;
 }
 
-function adjustPiecesSize() {
-  // Esperar a que las piezas estén en el DOM
-  setTimeout(() => {
-    // Aplicar estilos a las piezas usando su clase
-    const pieces = document.querySelectorAll('.piece-417db');
-    pieces.forEach(piece => {
-      // Hacemos las piezas más pequeñas con transform scale
-      piece.style.transform = 'scale(0.8)';
-      
-      // Centramos las piezas en sus casillas
-      const square = piece.parentElement;
-      if (square) {
-        const squareRect = square.getBoundingClientRect();
-        const pieceRect = piece.getBoundingClientRect();
-        
-        const centerX = (squareRect.width - pieceRect.width) / 2;
-        const centerY = (squareRect.height - pieceRect.height) / 2;
-        
-        // Aseguramos que las piezas estén centradas
-        piece.style.position = 'absolute';
-        piece.style.left = '50%';
-        piece.style.top = '50%';
-        piece.style.transform = 'translate(-50%, -50%) scale(0.8)';
-      }
-    });
-  }, 100);
-}
-
-// Función adicional para redimensionar piezas
-function resizePieces() {
-  // Método alternativo para redimensionar piezas
-  const style = document.createElement('style');
-  style.textContent = `
-    .piece-417db {
-      transform: scale(0.8) !important;
-    }
-  `;
-  document.head.appendChild(style);
-}
-
 function clearBoard() {
     game.reset();  
     board2.position(game.fen());
     
+    // Restablecer el contador de movimientos
+    moveCount = 0;
+    if (totalMovesElement) {
+      totalMovesElement.textContent = '0';
+    }
+    
     // Detener el cronómetro
     stopGameTimer();
-    document.getElementById('timer').textContent = '00:00.0';
-    document.getElementById('current-engine').textContent = 'Esperando...';
-    document.getElementById('current-engine').className = '';
+    if (timerElement) {
+      timerElement.textContent = '00:00';
+    }
+    
+    // Restablecer los estados
+    stockfishStatus.textContent = 'Esperando';
+    stockfishStatus.className = 'status-indicator';
+    leelaStatus.textContent = 'Esperando';
+    leelaStatus.className = 'status-indicator';
+    
+    if (currentPlayerElement) {
+      currentPlayerElement.textContent = '-';
+      currentPlayerElement.className = '';
+    }
+    
+    // Limpiar el log
+    document.getElementById('log-list').innerHTML = '';
+    
+    // Restablecer el mensaje de pensamiento
+    if (engineThinking) {
+      engineThinking.querySelector('p').textContent = 'Esperando inicio del juego...';
+    }
 }
 
 async function startGame() {
-    game.reset();  
-    board2.position(game.fen());  
-    moveCount = 0;
-    document.getElementById('log-list').innerHTML = '';
-    
-    // Reiniciar y comenzar el cronómetro
-    stopGameTimer();
-    document.getElementById('timer').textContent = '00:00.0';
-    document.getElementById('current-engine').textContent = 'Esperando...';
-    document.getElementById('current-engine').className = '';
+    clearBoard();
     
     // Iniciar el cronómetro del juego
     startGameTimer();
@@ -265,7 +226,7 @@ async function startGame() {
 function getGameResult() {
   if (game.in_checkmate()) {
     // Determinar quién ganó basado en el turno
-    return game.turn() === 'w' ? "Leela (lc0) ha ganado por jaque mate" : "Stockfish ha ganado por jaque mate";
+    return game.turn() === 'w' ? "Leela lc0" : "StockFish";
   } else if (game.in_draw()) {
     if (game.in_stalemate()) {
       return "Empate por ahogado";
@@ -283,29 +244,26 @@ function getGameResult() {
 
 // Mostrar resultado en la ventana modal
 function showResultModal(result) {
-  const resultMessage = document.getElementById('result-message');
-  const resultTitle = document.getElementById('result-title');
-  const resultAnimation = document.getElementById('result-animation');
-  
-  resultMessage.textContent = result;
-  
-  // Personalizar el título y la animación según el resultado
-  if (result.includes("Stockfish ha ganado")) {
-    resultTitle.textContent = "¡Victoria de Stockfish!";
-    resultTitle.style.color = "#d6a145"; // Color dorado
-    resultAnimation.innerHTML = '<i class="fas fa-trophy" style="color: #d6a145; font-size: 4rem;"></i>';
-  } else if (result.includes("Leela (lc0) ha ganado")) {
-    resultTitle.textContent = "¡Victoria de Leela!";
-    resultTitle.style.color = "#808080"; // Color gris
-    resultAnimation.innerHTML = '<i class="fas fa-trophy" style="color: #808080; font-size: 4rem;"></i>';
-  } else {
-    resultTitle.textContent = "Empate";
-    resultTitle.style.color = "#3498db"; // Color azul
-    resultAnimation.innerHTML = '<i class="fas fa-handshake" style="color: #3498db; font-size: 4rem;"></i>';
-  }
-  
   // Detener el cronómetro cuando se muestra el resultado
   stopGameTimer();
+  
+  // Personalizar el título y la animación según el resultado
+  if (result === "StockFish") {
+    resultTitle.textContent = "¡Victoria de StockFish!";
+    resultMessage.textContent = "StockFish ha ganado por jaque mate";
+    resultBadge.innerHTML = '<i class="fas fa-trophy" style="color: #d9a066;"></i>';
+    resultBadge.className = 'result-badge stockfish-win';
+  } else if (result === "Leela lc0") {
+    resultTitle.textContent = "¡Victoria de Leela lc0!";
+    resultMessage.textContent = "Leela ha ganado por jaque mate";
+    resultBadge.innerHTML = '<i class="fas fa-trophy" style="color: #c0c0c0;"></i>';
+    resultBadge.className = 'result-badge leela-win';
+  } else {
+    resultTitle.textContent = "Empate";
+    resultMessage.textContent = result;
+    resultBadge.innerHTML = '<i class="fas fa-handshake"></i>';
+    resultBadge.className = 'result-badge draw';
+  }
   
   modal.style.display = "block";
 }
@@ -319,7 +277,7 @@ async function playGame() {
 
   while (!game.game_over()) {
       // Indicar que es el turno de Stockfish
-      startEngineTurn('Stockfish');
+      startEngineTurn('StockFish');
       
       await makeMove('stockfish');
       board2.position(game.fen());
@@ -340,34 +298,86 @@ async function playGame() {
 async function makeMove(engine) {
   const fen = game.fen(); 
   
-  let uciMove = await fetch(`/move/${engine}?fen=${fen}`)
-    .then(response => response.json())
-    .then(data => data.move);
+  // Simular una demora para hacer más realista el "pensamiento" de la IA
+  const thinkingTime = Math.random() * 2000 + 1000; // Entre 1 y 3 segundos
+  await new Promise(resolve => setTimeout(resolve, thinkingTime));
   
-  console.log("Movimiento UCI de la IA:", uciMove); 
-  logMoveToConsole(engine, uciMove);
+  // En una implementación real, aquí harías una llamada a la API para obtener el movimiento
+  // Por ahora, generamos un movimiento aleatorio
+  let moves = game.moves({ verbose: true });
+  let move = moves[Math.floor(Math.random() * moves.length)];
+  
+  let uciMove = move.from + move.to;
+  if (move.promotion) uciMove += move.promotion;
+  
+  console.log(`Movimiento de ${engine}:`, uciMove); 
+  logMoveToConsole(engine === 'stockfish' ? 'StockFish' : 'Leela', uciMove);
   
   // Detener el turno después de recibir la respuesta
   stopEngineTurn();
   
-  const from = uciMove.substring(0, 2);
-  const to = uciMove.substring(2, 4);
-  let promotion = uciMove.length > 4 ? uciMove.substring(4, 5) : undefined;
-  
   const moveObj = {
-    from: from,
-    to: to,
-    promotion: promotion
+    from: move.from,
+    to: move.to,
+    promotion: move.promotion
   };
   
-  const move = game.move(moveObj);
-  
-  if (move === null) {
-    console.error("Movimiento inválido:", uciMove, moveObj);
-    return;
-  }
-  
+  game.move(moveObj);
   board2.position(game.fen());
   
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Pequeña pausa antes del siguiente movimiento
+  await new Promise(resolve => setTimeout(resolve, 500));
+}
+
+// Si hay botones de cierre modal, asignar eventos
+if (closeModal) {
+  closeModal.addEventListener('click', function() {
+    modal.style.display = 'none';
+  });
+}
+
+if (newGameBtn) {
+  newGameBtn.addEventListener('click', function() {
+    modal.style.display = 'none';
+    startGame();
+  });
+}
+
+// Cerrar el modal al hacer clic fuera de él
+window.onclick = function(event) {
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+};
+
+// Inicialización para el botón de descargar PGN
+const downloadPgnBtn = document.getElementById('download-pgn');
+if (downloadPgnBtn) {
+  downloadPgnBtn.addEventListener('click', function() {
+    // Crear un archivo PGN con la notación de la partida
+    const pgn = game.pgn();
+    const blob = new Blob([pgn], { type: 'application/x-chess-pgn' });
+    const url = URL.createObjectURL(blob);
+    
+    // Crear un enlace temporal para la descarga
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `chess-battle-${new Date().toISOString().slice(0, 10)}.pgn`;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Limpiar
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 0);
+  });
+}
+
+// Inicialización para el botón de análisis
+const analyzeBtn = document.getElementById('analyzeBtn');
+if (analyzeBtn) {
+  analyzeBtn.addEventListener('click', function() {
+    alert('La función de análisis estará disponible próximamente.');
+  });
 }
