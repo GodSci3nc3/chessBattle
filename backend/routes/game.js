@@ -22,7 +22,7 @@ router.get('/:engine', async (req, res) => {
             return res.status(400).json({ error: 'Motor no válido' });
         }
 
-        return res.json({ move });  // Asegúrate de devolver solo la jugada
+        return res.json({ move });  
     } catch (error) {
         res.status(500).json({ error: error.toString() });
     }

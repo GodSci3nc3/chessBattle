@@ -7,19 +7,16 @@ const getLc0Move = require("./routes/lc0");
 const app = express();
 const port = 3000;
 
-// Habilitar CORS para permitir solicitudes desde el frontend
 app.use(cors());
 
-// Ruta para servir la página principal
 app.use(express.static(path.join(__dirname, '../frontend'), {
     setHeaders: function (res, filePath) {
         if (filePath.endsWith('.js')) {
-            res.set('Content-Type', 'application/javascript');  // Asegura que se sirva como JavaScript
+            res.set('Content-Type', 'application/javascript');  
         }
     }
 }));
 
-// Ruta para manejar las jugadas de las IAs
 app.get("/move/:engine", async (req, res) => {
     const { engine } = req.params;
     const { fen } = req.query;
@@ -45,7 +42,6 @@ app.get("/move/:engine", async (req, res) => {
     }
 });
 
-// Iniciar el servidor
 app.listen(port, '0.0.0.0', () => {
     console.log(`Servidor corriendo en http://localhost:${port}`);
 });

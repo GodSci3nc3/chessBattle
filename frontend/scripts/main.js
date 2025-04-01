@@ -14,6 +14,47 @@ var board2 = Chessboard('chessboard', {
 $('#startBtn').on('click', startGame);
 $('#clearBtn').on('click', clearBoard);
 
+// Variables para el cronómetro
+let gameStartTime = 0;
+let moveStartTime = 0;
+let timerInterval = null;
+let totalElapsedTime = '00:00.0';
+let currentEngine = '';
+
+// Crear y agregar el elemento del cronómetro en el HTML
+const timerHTML = `
+  <div id="timer-container">
+    <div class="timer-wrapper">
+      <div class="timer-block">
+        <div class="timer-label">
+          <span id="current-engine">Esperando...</span> está pensando
+        </div>
+      </div>
+      <div class="timer-block">
+        <div class="timer-label">Tiempo total:</div>
+        <div id="timer" class="timer">00:00.0</div>
+      </div>
+    </div>
+  </div>
+`;
+
+// Insertar el HTML del temporizador justo después del tablero
+document.querySelector('.button-group').insertAdjacentHTML('afterend', timerHTML);
+
+// Crear y agregar HTML de la ventana modal al documento
+const modalHTML = `
+  <div id="result-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 id="result-title">Partida Finalizada</h2>
+      <p id="result-message"></p>
+      <div id="final-time">Tiempo total: <span id="final-time-value">00:00.0</span></div>
+      <div id="result-animation"></div>
+      <button id="new-game-btn">Nueva Partida</button>
+    </div>
+  </div>
+`;
+document.body.insertAdjacentHTML('beforeend', modalHTML);
 
 // Configuración de la ventana modal
 const modal = document.getElementById('result-modal');
@@ -49,6 +90,81 @@ document.getElementById('toggle-console').addEventListener('click', function() {
     chevronIcon.className = 'fas fa-chevron-down';
   }
 });
+
+// Funciones para el cronómetro
+function startGameTimer() {
+  // Iniciar el cronómetro del juego
+  gameStartTime = Date.now();
+  timerInterval = setInterval(updateTimer, 100);
+}
+
+function startEngineTurn(engine) {
+  // Actualizar el motor actual y guardar el tiempo de inicio del movimiento
+  currentEngine = engine;
+  document.getElementById('current-engine').textContent = engine;
+  document.getElementById('current-engine').className = engine.toLowerCase() === 'stockfish' ? 'engine-stockfish' : 'engine-leela';
+  moveStartTime = Date.now();
+}
+
+function stopEngineTurn() {
+  if (moveStartTime > 0 && currentEngine) {
+    // Calcular cuánto tiempo tomó el movimiento
+    const moveDuration = calculateMoveDuration();
+    updateLastLogItemWithTime(moveDuration);
+  }
+}
+
+function calculateMoveDuration() {
+  const elapsedMs = Date.now() - moveStartTime;
+  const minutes = Math.floor(elapsedMs / 60000);
+  const seconds = Math.floor((elapsedMs % 60000) / 1000);
+  const tenths = Math.floor((elapsedMs % 1000) / 100);
+  
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${tenths}`;
+}
+
+function stopGameTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  
+  // Guardar el tiempo final
+  document.getElementById('final-time-value').textContent = totalElapsedTime;
+}
+
+function updateTimer() {
+  const elapsedMs = Date.now() - gameStartTime;
+  const minutes = Math.floor(elapsedMs / 60000);
+  const seconds = Math.floor((elapsedMs % 60000) / 1000);
+  const tenths = Math.floor((elapsedMs % 1000) / 100);
+  
+  totalElapsedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${tenths}`;
+  document.getElementById('timer').textContent = totalElapsedTime;
+}
+
+function updateLastLogItemWithTime(time) {
+  const logList = document.getElementById('log-list');
+  const lastLogItem = logList.lastElementChild;
+  
+  if (lastLogItem) {
+    // Crear elemento de tiempo
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'move-time';
+    timeSpan.textContent = time;
+    
+    // Crear elemento de tiempo total
+    const totalTimeSpan = document.createElement('span');
+    totalTimeSpan.className = 'total-time';
+    totalTimeSpan.textContent = totalElapsedTime;
+    
+    // Añadir tiempos al último elemento de log
+    lastLogItem.appendChild(document.createTextNode(' - Duración: '));
+    lastLogItem.appendChild(timeSpan);
+    lastLogItem.appendChild(document.createTextNode(' - Tiempo total: '));
+    lastLogItem.appendChild(totalTimeSpan);
+  }
+}
 
 // Función para agregar logs
 let moveCount = 0;
@@ -118,7 +234,13 @@ function resizePieces() {
 
 function clearBoard() {
     game.reset();  
-    board2.position(game.fen());  
+    board2.position(game.fen());
+    
+    // Detener el cronómetro
+    stopGameTimer();
+    document.getElementById('timer').textContent = '00:00.0';
+    document.getElementById('current-engine').textContent = 'Esperando...';
+    document.getElementById('current-engine').className = '';
 }
 
 async function startGame() {
@@ -126,6 +248,15 @@ async function startGame() {
     board2.position(game.fen());  
     moveCount = 0;
     document.getElementById('log-list').innerHTML = '';
+    
+    // Reiniciar y comenzar el cronómetro
+    stopGameTimer();
+    document.getElementById('timer').textContent = '00:00.0';
+    document.getElementById('current-engine').textContent = 'Esperando...';
+    document.getElementById('current-engine').className = '';
+    
+    // Iniciar el cronómetro del juego
+    startGameTimer();
 
     playGame();
 }
@@ -173,6 +304,9 @@ function showResultModal(result) {
     resultAnimation.innerHTML = '<i class="fas fa-handshake" style="color: #3498db; font-size: 4rem;"></i>';
   }
   
+  // Detener el cronómetro cuando se muestra el resultado
+  stopGameTimer();
+  
   modal.style.display = "block";
 }
 
@@ -184,13 +318,19 @@ async function playGame() {
   }
 
   while (!game.game_over()) {
+      // Indicar que es el turno de Stockfish
+      startEngineTurn('Stockfish');
+      
       await makeMove('stockfish');
-      board2.position(game.fen());  
-
-      if (game.game_over()) break;  
-
+      board2.position(game.fen());
+      
+      if (game.game_over()) break;
+      
+      // Indicar que es el turno de Leela
+      startEngineTurn('Leela');
+      
       await makeMove('lc0');
-      board2.position(game.fen()); 
+      board2.position(game.fen());
   }
 
   const result = getGameResult();
@@ -206,6 +346,9 @@ async function makeMove(engine) {
   
   console.log("Movimiento UCI de la IA:", uciMove); 
   logMoveToConsole(engine, uciMove);
+  
+  // Detener el turno después de recibir la respuesta
+  stopEngineTurn();
   
   const from = uciMove.substring(0, 2);
   const to = uciMove.substring(2, 4);

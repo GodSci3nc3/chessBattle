@@ -10,7 +10,7 @@
     --log-bg: #2b2825;
     --log-item-bg: #3b3834;
     --log-header-bg: #463d35;
-    --square-size: 50px; /* Tamaño base de cada casilla */
+    --square-size: 50px; 
   }
   
   * {
@@ -81,7 +81,6 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   }
 
-  /* Para hacer las piezas más pequeñas */
   .chess-piece-container {
     position: relative;
     width: 100%;
@@ -100,19 +99,16 @@
     transform: translate(-50%, -50%);
   }
 
-  /* Aquí está la clave para hacer las piezas más pequeñas */
   .piece-417db {
     transform: scale(0.8) !important;
     transition: transform 0.2s ease;
   }
   
-  /* Opcional: Hover para agrandar ligeramente al pasar el cursor */
   .piece-417db:hover {
     transform: scale(0.85) !important;
     cursor: pointer;
   }
   
-  /* Customize chess board colors to match our theme */
   .white-1e1d7 {
     background-color: var(--board-light) !important;
     color: var(--board-dark) !important;
@@ -243,6 +239,62 @@
     transform: translateX(5px);
     background: var(--secondary-bg);
   }
+
+  #timer-container {
+    margin: 20px 0;
+    max-width: 400px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--board-dark);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .timer-wrapper {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .timer-label {
+    font-size: 16px;
+    margin-right: 10px;
+    flex-grow: 1;
+  }
+  
+  .timer {
+    font-size: 24px;
+    font-weight: bold;
+    font-family: monospace;
+    color: #333;
+    background-color: #fff;
+    padding: 8px 15px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    min-width: 100px;
+    text-align: center;
+  }
+  
+  #current-engine {
+    font-weight: bold;
+  }
+  
+  #current-engine.engine-stockfish {
+    color: #d6a145;
+  }
+  
+  #current-engine.engine-leela {
+    color: #808080; 
+  }
+  
+  .move-time {
+    font-family: monospace;
+    font-weight: bold;
+    color: #0066cc;
+    margin-left: 5px;
+  }
   
   .move-count {
     display: inline-block;
@@ -256,14 +308,13 @@
   }
   
   .engine-stockfish {
-    color: #ffd700; /* Gold color for StockFish */
+    color: #ffd700; 
   }
   
   .engine-leela {
-    color: #c0c0c0; /* Silver color for Leela */
+    color: #c0c0c0; 
   }
   
-  /* Padding interno adicional para las casillas */
   .square-55d63 {
     padding: 2px !important;
   }
@@ -329,6 +380,7 @@
   #result-message {
     font-size: 1.2rem;
     margin-bottom: 20px;
+    color: var(--log-bg);
   }
   
   #result-animation {
