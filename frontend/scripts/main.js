@@ -134,18 +134,15 @@ function updateLastLogItemWithTime(time) {
   const lastLogItem = logList.lastElementChild;
   
   if (lastLogItem) {
-    // Crear elemento de tiempo
     const timeSpan = document.createElement('span');
     timeSpan.className = 'move-time';
     timeSpan.textContent = time;
     
-    // Añadir tiempo al último elemento de log
     lastLogItem.appendChild(document.createTextNode(' - Tiempo: '));
     lastLogItem.appendChild(timeSpan);
   }
 }
 
-// Función para agregar logs
 let moveCount = 0;
 function logMoveToConsole(engine, move) {
   moveCount++;
@@ -167,12 +164,15 @@ function logMoveToConsole(engine, move) {
   
   logList.appendChild(logItem);
   
-  // Actualizar el contador de movimientos
   if (totalMovesElement) {
     totalMovesElement.textContent = moveCount;
   }
   
-  // Auto-scroll al último item
+  const currentMoveElement = document.getElementById('current-move');
+  if (currentMoveElement) {
+    currentMoveElement.textContent = moveCount;
+  }
+  
   const consoleContent = document.getElementById('console-content');
   consoleContent.scrollTop = consoleContent.scrollHeight;
 }
@@ -181,19 +181,21 @@ function clearBoard() {
     game.reset();  
     board2.position(game.fen());
     
-    // Restablecer el contador de movimientos
     moveCount = 0;
     if (totalMovesElement) {
       totalMovesElement.textContent = '0';
     }
     
-    // Detener el cronómetro
+    const currentMoveElement = document.getElementById('current-move');
+    if (currentMoveElement) {
+      currentMoveElement.textContent = '0';
+    }
+    
     stopGameTimer();
     if (timerElement) {
       timerElement.textContent = '00:00';
     }
     
-    // Restablecer los estados
     stockfishStatus.textContent = 'Esperando';
     stockfishStatus.className = 'status-indicator';
     leelaStatus.textContent = 'Esperando';
@@ -204,28 +206,22 @@ function clearBoard() {
       currentPlayerElement.className = '';
     }
     
-    // Limpiar el log
     document.getElementById('log-list').innerHTML = '';
     
-    // Restablecer el mensaje de pensamiento
     if (engineThinking) {
       engineThinking.querySelector('p').textContent = 'Esperando inicio del juego...';
     }
 }
-
 async function startGame() {
     clearBoard();
     
-    // Iniciar el cronómetro del juego
     startGameTimer();
 
     playGame();
 }
 
-// Función para determinar el resultado del juego
 function getGameResult() {
   if (game.in_checkmate()) {
-    // Determinar quién ganó basado en el turno
     return game.turn() === 'w' ? "Leela lc0" : "StockFish";
   } else if (game.in_draw()) {
     if (game.in_stalemate()) {
@@ -242,12 +238,9 @@ function getGameResult() {
   }
 }
 
-// Mostrar resultado en la ventana modal
 function showResultModal(result) {
-  // Detener el cronómetro cuando se muestra el resultado
   stopGameTimer();
   
-  // Personalizar el título y la animación según el resultado
   if (result === "StockFish") {
     resultTitle.textContent = "¡Victoria de StockFish!";
     resultMessage.textContent = "StockFish ha ganado por jaque mate";
@@ -276,7 +269,6 @@ async function playGame() {
   }
 
   while (!game.game_over()) {
-      // Indicar que es el turno de Stockfish
       startEngineTurn('StockFish');
       
       await makeMove('stockfish');
@@ -298,12 +290,9 @@ async function playGame() {
 async function makeMove(engine) {
   const fen = game.fen(); 
   
-  // Simular una demora para hacer más realista el "pensamiento" de la IA
-  const thinkingTime = Math.random() * 2000 + 1000; // Entre 1 y 3 segundos
+  const thinkingTime = Math.random() * 2000 + 1000; 
   await new Promise(resolve => setTimeout(resolve, thinkingTime));
   
-  // En una implementación real, aquí harías una llamada a la API para obtener el movimiento
-  // Por ahora, generamos un movimiento aleatorio
   let moves = game.moves({ verbose: true });
   let move = moves[Math.floor(Math.random() * moves.length)];
   
@@ -313,7 +302,6 @@ async function makeMove(engine) {
   console.log(`Movimiento de ${engine}:`, uciMove); 
   logMoveToConsole(engine === 'stockfish' ? 'StockFish' : 'Leela', uciMove);
   
-  // Detener el turno después de recibir la respuesta
   stopEngineTurn();
   
   const moveObj = {
@@ -325,11 +313,9 @@ async function makeMove(engine) {
   game.move(moveObj);
   board2.position(game.fen());
   
-  // Pequeña pausa antes del siguiente movimiento
   await new Promise(resolve => setTimeout(resolve, 500));
 }
 
-// Si hay botones de cierre modal, asignar eventos
 if (closeModal) {
   closeModal.addEventListener('click', function() {
     modal.style.display = 'none';
@@ -343,30 +329,25 @@ if (newGameBtn) {
   });
 }
 
-// Cerrar el modal al hacer clic fuera de él
 window.onclick = function(event) {
   if (event.target === modal) {
     modal.style.display = 'none';
   }
 };
 
-// Inicialización para el botón de descargar PGN
 const downloadPgnBtn = document.getElementById('download-pgn');
 if (downloadPgnBtn) {
   downloadPgnBtn.addEventListener('click', function() {
-    // Crear un archivo PGN con la notación de la partida
     const pgn = game.pgn();
     const blob = new Blob([pgn], { type: 'application/x-chess-pgn' });
     const url = URL.createObjectURL(blob);
     
-    // Crear un enlace temporal para la descarga
     const a = document.createElement('a');
     a.href = url;
     a.download = `chess-battle-${new Date().toISOString().slice(0, 10)}.pgn`;
     document.body.appendChild(a);
     a.click();
     
-    // Limpiar
     setTimeout(() => {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
@@ -374,7 +355,6 @@ if (downloadPgnBtn) {
   });
 }
 
-// Inicialización para el botón de análisis
 const analyzeBtn = document.getElementById('analyzeBtn');
 if (analyzeBtn) {
   analyzeBtn.addEventListener('click', function() {

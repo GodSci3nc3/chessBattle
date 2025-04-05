@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
           labels: ['StockFish', 'Leela', 'Tablas'],
           datasets: [{
-            data: [483, 451, 309],
+            data: [672, 519, 685],
             backgroundColor: [
               'rgba(255, 215, 0, 0.7)',
               'rgba(192, 192, 192, 0.7)',
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   const value = context.raw || 0;
                   const total = context.dataset.data.reduce((a, b) => a + b, 0);
                   const percentage = Math.round((value / total) * 100);
-                  return `${label}: ${value} (${percentage}%)`;
+                  return `${label}: ${value} partidas (${percentage}%)`;
                 }
               }
             }
